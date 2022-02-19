@@ -51,7 +51,7 @@ public:
         { return *const_cast<Map*>(this)->Provide(s); }
 private:
     const item *ProvideItem(const char *s) const {
-        if(begin == end)
+        if(begin == end || !s || !*s)
             return 0;
         for(item *p = begin; p < end; p++) {
             if(0 == strcmp(p->key, s))
