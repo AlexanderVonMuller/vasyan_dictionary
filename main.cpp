@@ -84,6 +84,7 @@ private:
     void operator=(const Map&) {}
 };
 
+
 static inline void test(Map &m)
 {
     m.Add("1", 1);
@@ -117,11 +118,11 @@ int main()
         diff.tv_sec--;
         diff.tv_usec += 1000*1000;
     }
-    printf("res == %ld.%ld\n", diff.tv_sec, diff.tv_usec);
+    printf("%ld.%ld\n", diff.tv_sec, diff.tv_usec);
 #else
     clock_t end = clock();
     double diff = static_cast<double>(end - begin)/CLOCKS_PER_SEC;
-    printf("res == %.6f\n", diff);
+    printf("%.6f\n", diff);
 #endif
     return 0;
 }

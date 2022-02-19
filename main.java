@@ -12,6 +12,6 @@ public class main {
         }
         long end = System.currentTimeMillis();
         double diff = (double)(end - begin)/1000;
-        System.out.println("res == " + diff);
+        System.out.println(diff);
     }
 }
