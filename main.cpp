@@ -20,19 +20,29 @@ class Map {
 public:
     Map() : begin(0), end(0) {}
     virtual ~Map() { Release(); }
-    void Add(const char *s, int v) {
+    void AddItem(const char *s, int v) {
         if(begin == end)
             Resize();
-        item *p = const_cast<item*>(ProvideFreePos());
+        item *p = const_cast<item*>(ProvideFreePosition());
         if(!p) {
             Resize();
-            p = const_cast<item*>(ProvideFreePos());
+            p = const_cast<item*>(ProvideFreePosition());
         }
         p->val = v;
         strcpy(p->key, s);
     }
+    void AddOrAssign(const char *s, int v) {
+        if(begin != end) {
+            item *p = const_cast<item*>(ProvideItemByKey(s));
+            if(p) {
+                p->val = v;
+                return;
+            }
+        }
+        AddItem(s, v);
+    }
     void Remove(const char *s) {
-        item *p = const_cast<item*>(ProvideItem(s));
+        item *p = const_cast<item*>(ProvideItemByKey(s));
         if(p)
             p->key[0] = 0;
     }
@@ -43,14 +53,18 @@ public:
             end = 0;
         }
     }
-    int *Provide(const char *s)
-        { return &const_cast<item*>(ProvideItem(s))->val; }
+    int *ProvideValue(const char *s) {
+        item *pos = const_cast<item*>(ProvideItemByKey(s));
+        if(!pos)
+            return 0;
+        return &pos->val;
+    }
     int &operator[](const char *s)
-        { return *Provide(s); }
+        { return *ProvideValue(s); }
     int operator[](const char *s) const
-        { return *const_cast<Map*>(this)->Provide(s); }
+        { return *const_cast<Map*>(this)->ProvideValue(s); }
 private:
-    const item *ProvideItem(const char *s) const {
+    const item *ProvideItemByKey(const char *s) const {
         if(begin == end || !s || !*s)
             return 0;
         for(item *p = begin; p < end; p++) {
@@ -59,7 +73,7 @@ private:
         }
         return 0;
     }
-    const item *ProvideFreePos() const {
+    const item *ProvideFreePosition() const {
         if(begin == end)
             return 0;
         for(item *p = begin; p < end; p++) {
@@ -70,7 +84,7 @@ private:
     }
     void Resize() {
         int old_size = end - begin;
-        int new_size = begin ? 2*old_size : 16;
+        int new_size = begin ? 2*old_size : 8;
         item *p = new item[new_size];
         if(begin) {
             for(int i = 0; i < old_size; i++)
@@ -87,9 +101,9 @@ private:
 
 static inline void test(Map &m)
 {
-    m.Add("1", 1);
-    m.Add("2", 2);
-    m.Add("3", m["1"] + m["2"]);
+    m.AddItem("1", 1);
+    m.AddItem("2", 2);
+    m.AddItem("3", m["1"] + m["2"]);
 }
 
 int main()
